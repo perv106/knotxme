@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creator Dashboard — Knotxme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script>window.KNOTXME_REQUIRED_ROLE = "creator";</script>
+</head>
+<body>
+
+<div class="dash-shell">
+  <aside class="dash-sidebar">
+    <a href="index.html" class="logo"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 10c4-6 12-6 16 0s-2 12-6 12-8-4-8-8 4-6 8-4 4 8-2 10-10-2-8-10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>KNOT<b>X</b>ME</a>
+    <nav class="dash-nav">
+      <a href="#" data-tab="dashboard" class="active">Dashboard</a>
+      <a href="#" data-tab="profile">My Profile</a>
+      <a href="#" data-tab="opportunities">Available Opportunities</a>
+      <a href="#" data-tab="accepted">Accepted Campaigns</a>
+      <a href="#" data-tab="previous">Previous Campaigns</a>
+      <a href="#" data-tab="settings">Settings</a>
+    </nav>
+    <div class="dash-user">
+      <div id="userLabel">Loading…</div>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+
+    <section id="tab-dashboard" class="dash-tab">
+      <div class="dash-head"><h1>Welcome back<span id="welcomeName"></span></h1></div>
+      <div class="dash-stats" id="statsRow">
+        <div class="dash-stat"><div class="num">—</div><div class="label">Accepted Campaigns</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Completed Campaigns</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Profile Completion</div></div>
+      </div>
+      <div class="dash-panel">
+        <h2>New Opportunities For You</h2>
+        <div id="recentOpps" class="loading-row">Loading…</div>
+      </div>
+    </section>
+
+    <section id="tab-profile" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>My Profile</h1></div>
+      <div class="dash-panel">
+        <form id="profileForm">
+          <div class="grid-2" style="gap:20px;">
+            <div class="form-field"><label>Name</label><input type="text" id="p-name"></div>
+            <div class="form-field"><label>Username</label><input type="text" id="p-username"></div>
+            <div class="form-field"><label>Platforms</label><input type="text" id="p-platforms" placeholder="Instagram, YouTube"></div>
+            <div class="form-field"><label>Niche</label><input type="text" id="p-niche"></div>
+            <div class="form-field"><label>Categories</label><input type="text" id="p-categories" placeholder="comma-separated"></div>
+            <div class="form-field"><label>Followers</label><input type="number" id="p-followers"></div>
+            <div class="form-field"><label>Engagement Rate (%)</label><input type="number" step="0.01" id="p-engagementRate"></div>
+            <div class="form-field"><label>Pricing (₹)</label><input type="text" id="p-pricing"></div>
+            <div class="form-field"><label>Languages</label><input type="text" id="p-languages" placeholder="comma-separated"></div>
+            <div class="form-field"><label>Location</label><input type="text" id="p-location"></div>
+            <div class="form-field"><label>Portfolio Link</label><input type="text" id="p-portfolio"></div>
+            <div class="form-field">
+              <label>Availability</label>
+              <select id="p-availability"><option>Available</option><option>Busy</option><option>Not Available</option></select>
+            </div>
+          </div>
+          <div class="form-field"><label>Social Links</label><input type="text" id="p-socialLinks" placeholder="comma-separated URLs"></div>
+          <button type="submit" class="btn btn-primary">Save Profile</button>
+          <div class="auth-success" id="profileSuccess"></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="tab-opportunities" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>Available Opportunities</h1></div>
+      <div class="filter-bar">
+        <select id="f-niche"><option value="">All Niches</option><option>Fashion</option><option>Tech</option><option>Gaming</option><option>Fitness</option><option>Beauty</option><option>Food</option><option>Finance</option></select>
+        <select id="f-platform"><option value="">All Platforms</option><option>Instagram</option><option>YouTube</option><option>Blog / Newsletter</option></select>
+        <input type="text" id="f-location" placeholder="Location">
+        <input type="number" id="f-minBudget" placeholder="Min budget (₹)">
+        <button class="btn btn-outline" id="applyFilters">Apply Filters</button>
+      </div>
+      <div id="oppsList" class="loading-row">Loading…</div>
+    </section>
+
+    <section id="tab-accepted" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>Accepted Campaigns</h1></div>
+      <div class="dash-panel">
+        <div id="acceptedList" class="loading-row">Loading…</div>
+      </div>
+    </section>
+
+    <section id="tab-previous" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>Previous Campaigns</h1></div>
+      <div class="dash-panel">
+        <table class="dash-table">
+          <thead><tr><th>Campaign</th><th>Brand</th><th>Platform</th><th>Status</th></tr></thead>
+          <tbody id="prevTableBody"><tr><td colspan="4" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-settings" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>Settings</h1></div>
+      <div class="dash-panel">
+        <p><a href="forgot-password.html">Change / reset your password →</a></p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth-guard.js"></script>
+<script>
+  knotxmeWireLogout("logoutBtn");
+  const user = window.KnotxmeAPI.getUser();
+  document.getElementById("userLabel").textContent = user.email + " · Creator";
+  document.getElementById("welcomeName").textContent = ", " + (user.name || "");
+
+  document.querySelectorAll(".dash-nav a[data-tab]").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      document.querySelectorAll(".dash-tab").forEach((s) => (s.style.display = "none"));
+      document.querySelectorAll(".dash-nav a").forEach((x) => x.classList.remove("active"));
+      document.getElementById("tab-" + a.dataset.tab).style.display = "block";
+      a.classList.add("active");
+      if (a.dataset.tab === "opportunities") loadOpportunities();
+    });
+  });
+
+  async function loadStats() {
+    try {
+      const s = await window.KnotxmeAPI.getCreatorStats();
+      const nums = document.querySelectorAll("#statsRow .num");
+      nums[0].textContent = s.acceptedCampaigns;
+      nums[1].textContent = s.completedCampaigns;
+      nums[2].textContent = s.profileCompletion + "%";
+    } catch (e) {}
+  }
+
+  function oppCard(o, showAccept) {
+    return `<div class="opp-card">
+      <h3>${o.campaignName}</h3>
+      <p style="color:var(--ink-60);margin-top:6px;font-size:14px;">${o.description || ""}</p>
+      <div class="meta">
+        <span class="tag">${o.platform}</span>
+        <span class="tag gold">₹${o.budget}</span>
+        <span class="tag teal">${o.niche}</span>
+        ${o.followersRequired ? `<span class="tag">${o.followersRequired} followers</span>` : ""}
+      </div>
+      ${showAccept ? `<div style="margin-top:16px;"><button class="btn btn-primary accept-btn" data-id="${o._id}">Accept Campaign</button></div>` : ""}
+    </div>`;
+  }
+
+  async function loadOpportunities() {
+    const listEl = document.getElementById("oppsList");
+    listEl.innerHTML = '<div class="loading-row">Loading…</div>';
+    const params = new URLSearchParams();
+    const niche = document.getElementById("f-niche").value;
+    const platform = document.getElementById("f-platform").value;
+    const location = document.getElementById("f-location").value;
+    const minBudget = document.getElementById("f-minBudget").value;
+    if (niche) params.set("niche", niche);
+    if (platform) params.set("platform", platform);
+    if (location) params.set("location", location);
+    if (minBudget) params.set("minBudget", minBudget);
+    const qs = params.toString() ? "?" + params.toString() : "";
+
+    try {
+      const opps = await window.KnotxmeAPI.getOpportunities(qs);
+      const recentEl = document.getElementById("recentOpps");
+      if (!opps.length) {
+        listEl.innerHTML = '<div class="dash-empty">No matching opportunities right now — check back soon.</div>';
+        if (recentEl) recentEl.innerHTML = '<div class="dash-empty">No opportunities yet.</div>';
+        return;
+      }
+      listEl.innerHTML = opps.map(o => oppCard(o, true)).join("");
+      if (recentEl) recentEl.innerHTML = opps.slice(0, 3).map(o => oppCard(o, false)).join("");
+
+      listEl.querySelectorAll(".accept-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          btn.textContent = "Accepting…";
+          try {
+            await window.KnotxmeAPI.acceptCampaign(btn.dataset.id);
+            btn.textContent = "Accepted ✓";
+            loadStats();
+            loadAccepted();
+          } catch (e) {
+            btn.textContent = "Accept Campaign";
+            btn.disabled = false;
+          }
+        });
+      });
+    } catch (e) {
+      listEl.textContent = "Could not load opportunities.";
+    }
+  }
+
+  document.getElementById("applyFilters").addEventListener("click", loadOpportunities);
+
+  async function loadAccepted() {
+    const el = document.getElementById("acceptedList");
+    try {
+      const campaigns = await window.KnotxmeAPI.getMyCampaigns();
+      const accepted = campaigns.filter(c => c.status === "Accepted" || c.status === "In Progress");
+      const previous = campaigns.filter(c => c.status === "Completed");
+
+      el.innerHTML = accepted.length
+        ? accepted.map(c => oppCard(c, false)).join("")
+        : '<div class="dash-empty">No accepted campaigns yet.</div>';
+
+      const prevBody = document.getElementById("prevTableBody");
+      prevBody.innerHTML = previous.length
+        ? previous.map(c => `<tr><td>${c.campaignName}</td><td>${c.brandName || "—"}</td><td>${c.platform}</td><td><span class="status-pill closed">Completed</span></td></tr>`).join("")
+        : '<tr><td colspan="4" class="dash-empty">No completed campaigns yet.</td></tr>';
+    } catch (e) {
+      el.textContent = "Could not load campaigns.";
+    }
+  }
+
+  async function loadProfile() {
+    try {
+      const p = await window.KnotxmeAPI.getCreatorProfile();
+      if (!p) return;
+      const map = { name:"p-name", username:"p-username", niche:"p-niche", followers:"p-followers",
+        engagementRate:"p-engagementRate", pricing:"p-pricing", location:"p-location", portfolio:"p-portfolio", availability:"p-availability" };
+      Object.keys(map).forEach(k => { const el = document.getElementById(map[k]); if (el && p[k] !== undefined && p[k] !== null) el.value = p[k]; });
+      if (p.platforms) document.getElementById("p-platforms").value = (p.platforms || []).join(", ");
+      if (p.categories) document.getElementById("p-categories").value = (p.categories || []).join(", ");
+      if (p.languages) document.getElementById("p-languages").value = (p.languages || []).join(", ");
+      if (p.socialLinks) document.getElementById("p-socialLinks").value = (p.socialLinks || []).join(", ");
+    } catch (e) {}
+  }
+
+  document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const okEl = document.getElementById("profileSuccess");
+    const payload = {
+      name: document.getElementById("p-name").value,
+      username: document.getElementById("p-username").value,
+      platforms: document.getElementById("p-platforms").value.split(",").map(s => s.trim()).filter(Boolean),
+      niche: document.getElementById("p-niche").value,
+      categories: document.getElementById("p-categories").value.split(",").map(s => s.trim()).filter(Boolean),
+      followers: document.getElementById("p-followers").value,
+      engagementRate: document.getElementById("p-engagementRate").value,
+      pricing: document.getElementById("p-pricing").value,
+      languages: document.getElementById("p-languages").value.split(",").map(s => s.trim()).filter(Boolean),
+      location: document.getElementById("p-location").value,
+      portfolio: document.getElementById("p-portfolio").value,
+      availability: document.getElementById("p-availability").value,
+      socialLinks: document.getElementById("p-socialLinks").value.split(",").map(s => s.trim()).filter(Boolean),
+    };
+    try {
+      await window.KnotxmeAPI.updateCreatorProfile(payload);
+      okEl.textContent = "Profile saved.";
+      okEl.classList.add("show");
+      loadStats();
+    } catch (err) {
+      okEl.textContent = "Could not save profile.";
+      okEl.classList.add("show");
+    }
+  });
+
+  loadStats();
+  loadOpportunities();
+  loadAccepted();
+  loadProfile();
+</script>
+</body>
+</html>

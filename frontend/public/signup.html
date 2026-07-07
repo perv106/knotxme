@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up — Knotxme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="site-header-mount"></div>
+
+<main>
+  <div class="auth-shell">
+    <div class="auth-card reveal in">
+      <div class="eyebrow">Join the first cohort</div>
+      <h1>Create your account</h1>
+      <p class="auth-sub">Sign up as a brand looking for creators, or a creator looking for brands.</p>
+
+      <div class="auth-role-tabs" id="roleTabs">
+        <button type="button" data-role="brand" class="active">Brand</button>
+        <button type="button" data-role="creator">Creator</button>
+      </div>
+
+      <form id="signupForm" style="margin-top:22px;">
+        <div class="form-field">
+          <label for="name" id="nameLabel">Company Name</label>
+          <input type="text" id="name" required>
+        </div>
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input type="email" id="email" required autocomplete="email">
+        </div>
+        <div class="form-field">
+          <label for="password">Password</label>
+          <input type="password" id="password" required minlength="8" autocomplete="new-password">
+        </div>
+        <div class="form-field">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" required minlength="8" autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+        <div class="auth-error" id="signupError"></div>
+        <div class="auth-success" id="signupSuccess"></div>
+      </form>
+
+      <p class="auth-foot">
+        Already have an account? <a href="login.html">Log in</a>
+      </p>
+    </div>
+  </div>
+</main>
+
+<div id="site-footer-mount"></div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/partials.js"></script>
+<script src="js/auth-nav.js"></script>
+<script>
+  let selectedRole = "brand";
+  const nameLabel = document.getElementById("nameLabel");
+  document.getElementById("roleTabs").addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-role]");
+    if (!btn) return;
+    selectedRole = btn.dataset.role;
+    document.querySelectorAll("#roleTabs button").forEach((b) => b.classList.toggle("active", b === btn));
+    nameLabel.textContent = selectedRole === "brand" ? "Company Name" : "Full Name";
+  });
+
+  document.getElementById("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById("signupError");
+    const okEl = document.getElementById("signupSuccess");
+    errEl.classList.remove("show");
+    okEl.classList.remove("show");
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      errEl.textContent = "Passwords do not match.";
+      errEl.classList.add("show");
+      return;
+    }
+
+    try {
+      await window.KnotxmeAPI.signup({ name, email, password, role: selectedRole });
+      okEl.textContent = "Account created. Redirecting to login…";
+      okEl.classList.add("show");
+      setTimeout(() => (window.location.href = "login.html"), 1200);
+    } catch (err) {
+      errEl.textContent = (err.data && err.data.message) || "Signup failed. Please try again.";
+      errEl.classList.add("show");
+    }
+  });
+</script>
+</body>
+</html>

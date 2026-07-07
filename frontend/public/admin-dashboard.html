@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Knotxme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script>window.KNOTXME_REQUIRED_ROLE = "admin";</script>
+</head>
+<body>
+
+<div class="dash-shell">
+  <aside class="dash-sidebar">
+    <a href="index.html" class="logo"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 10c4-6 12-6 16 0s-2 12-6 12-8-4-8-8 4-6 8-4 4 8-2 10-10-2-8-10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>KNOT<b>X</b>ME</a>
+    <nav class="dash-nav">
+      <a href="#" data-tab="overview" class="active">Overview</a>
+      <a href="#" data-tab="users">All Users</a>
+      <a href="#" data-tab="brands">All Brands</a>
+      <a href="#" data-tab="creators">All Creators</a>
+      <a href="#" data-tab="campaigns">All Campaigns</a>
+      <a href="#" data-tab="exports">Export Data</a>
+    </nav>
+    <div class="dash-user">
+      <div id="userLabel">Loading…</div>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+
+    <section id="tab-overview" class="dash-tab">
+      <div class="dash-head"><h1>Admin Overview</h1></div>
+      <div class="dash-stats" id="statsRow">
+        <div class="dash-stat"><div class="num">—</div><div class="label">Total Users</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Total Brands</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Total Creators</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Total Campaigns</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Active Users</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Blocked Users</div></div>
+      </div>
+      <div class="dash-panel">
+        <h2>Monthly Registrations</h2>
+        <canvas id="regChart" height="90"></canvas>
+      </div>
+      <div class="grid-2" style="gap:24px;">
+        <div class="dash-panel">
+          <h2>Recent Registrations</h2>
+          <div id="recentRegs" class="loading-row">Loading…</div>
+        </div>
+        <div class="dash-panel">
+          <h2>Recent Requirements</h2>
+          <div id="recentReqs" class="loading-row">Loading…</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-users" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>All Users</h1></div>
+      <div class="filter-bar">
+        <input type="text" id="userSearch" placeholder="Search by email or name…">
+        <select id="userRoleFilter"><option value="">All Roles</option><option value="brand">Brand</option><option value="creator">Creator</option><option value="admin">Admin</option></select>
+        <button class="btn btn-outline" id="userSearchBtn">Search</button>
+      </div>
+      <div class="dash-panel">
+        <table class="dash-table">
+          <thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody id="usersTableBody"><tr><td colspan="5" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-brands" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>All Brands</h1></div>
+      <div class="dash-panel">
+        <table class="dash-table">
+          <thead><tr><th>Company</th><th>Industry</th><th>Contact</th><th>Location</th><th>Status</th></tr></thead>
+          <tbody id="brandsTableBody"><tr><td colspan="5" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-creators" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>All Creators</h1></div>
+      <div class="dash-panel">
+        <table class="dash-table">
+          <thead><tr><th>Name</th><th>Niche</th><th>Followers</th><th>Platforms</th><th>Status</th></tr></thead>
+          <tbody id="creatorsTableBody"><tr><td colspan="5" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-campaigns" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>All Campaigns</h1></div>
+      <div class="dash-panel">
+        <table class="dash-table">
+          <thead><tr><th>Campaign</th><th>Brand</th><th>Platform</th><th>Budget</th><th>Status</th><th>Created</th></tr></thead>
+          <tbody id="campaignsTableBody"><tr><td colspan="6" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-exports" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>Export Data</h1></div>
+      <div class="dash-panel">
+        <p style="color:var(--ink-60);margin-bottom:20px;">Each export downloads a standalone .xlsx file.</p>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+          <a class="btn btn-primary" href="#" id="exportCreators">Export Creator Data</a>
+          <a class="btn btn-primary" href="#" id="exportBrands">Export Brand Data</a>
+          <a class="btn btn-primary" href="#" id="exportLogins">Export Login Data</a>
+          <a class="btn btn-primary" href="#" id="exportCampaigns">Export Campaign Requirements</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth-guard.js"></script>
+<script>
+  knotxmeWireLogout("logoutBtn");
+  const user = window.KnotxmeAPI.getUser();
+  document.getElementById("userLabel").textContent = user.email + " · Admin";
+
+  document.querySelectorAll(".dash-nav a[data-tab]").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      document.querySelectorAll(".dash-tab").forEach((s) => (s.style.display = "none"));
+      document.querySelectorAll(".dash-nav a").forEach((x) => x.classList.remove("active"));
+      document.getElementById("tab-" + a.dataset.tab).style.display = "block";
+      a.classList.add("active");
+      const loaders = { users: loadUsers, brands: loadBrands, creators: loadCreators, campaigns: loadCampaigns };
+      if (loaders[a.dataset.tab]) loaders[a.dataset.tab]();
+    });
+  });
+
+  function statusBadge(status) {
+    const map = { Active: "open", Blocked: "blocked", Suspended: "pending", Pending: "pending" };
+    return `<span class="status-pill ${map[status] || "closed"}">${status || "Active"}</span>`;
+  }
+
+  async function loadStats() {
+    try {
+      const s = await window.KnotxmeAPI.getAdminStats();
+      const nums = document.querySelectorAll("#statsRow .num");
+      nums[0].textContent = s.totalUsers;
+      nums[1].textContent = s.totalBrands;
+      nums[2].textContent = s.totalCreators;
+      nums[3].textContent = s.totalCampaigns;
+      nums[4].textContent = s.activeUsers;
+      nums[5].textContent = s.blockedUsers;
+
+      document.getElementById("recentRegs").innerHTML = (s.recentRegistrations || []).length
+        ? s.recentRegistrations.map(r => `<div class="opp-card"><h3>${r.email}</h3><div class="meta"><span class="tag">${r.role}</span></div></div>`).join("")
+        : '<div class="dash-empty">No recent registrations.</div>';
+
+      document.getElementById("recentReqs").innerHTML = (s.recentRequirements || []).length
+        ? s.recentRequirements.map(r => `<div class="opp-card"><h3>${r.campaignName}</h3><div class="meta"><span class="tag gold">₹${r.budget}</span></div></div>`).join("")
+        : '<div class="dash-empty">No recent requirements.</div>';
+
+      drawChart(s.monthlyRegistrations || []);
+    } catch (e) {}
+  }
+
+  function drawChart(data) {
+    const canvas = document.getElementById("regChart");
+    const ctx = canvas.getContext("2d");
+    canvas.width = canvas.offsetWidth;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!data.length) return;
+    const max = Math.max(...data.map(d => d.count), 1);
+    const barW = canvas.width / data.length;
+    ctx.fillStyle = "#E3A335";
+    data.forEach((d, i) => {
+      const h = (d.count / max) * (canvas.height - 20);
+      ctx.fillRect(i * barW + 6, canvas.height - h, barW - 12, h);
+      ctx.fillStyle = "#101B33";
+      ctx.font = "10px monospace";
+      ctx.fillText(d.month, i * barW + 6, canvas.height - 4);
+      ctx.fillStyle = "#E3A335";
+    });
+  }
+
+  async function loadUsers() {
+    const body = document.getElementById("usersTableBody");
+    body.innerHTML = '<tr><td colspan="5" class="loading-row">Loading…</td></tr>';
+    const q = document.getElementById("userSearch").value;
+    const role = document.getElementById("userRoleFilter").value;
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (role) params.set("role", role);
+    try {
+      const users = await window.KnotxmeAPI.getAllUsers("?" + params.toString());
+      body.innerHTML = users.length ? users.map(u => `<tr>
+        <td>${u.email}</td><td>${u.role}</td><td>${statusBadge(u.accountStatus)}</td>
+        <td>${new Date(u.createdDate).toLocaleDateString()}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-outline block-btn" data-id="${u._id}" data-status="Blocked" style="padding:6px 10px;font-size:11px;">Block</button>
+          <button class="btn btn-outline block-btn" data-id="${u._id}" data-status="Active" style="padding:6px 10px;font-size:11px;">Unblock</button>
+          <button class="btn btn-outline del-btn" data-id="${u._id}" style="padding:6px 10px;font-size:11px;">Delete</button>
+        </td>
+      </tr>`).join("") : '<tr><td colspan="5" class="dash-empty">No users found.</td></tr>';
+
+      body.querySelectorAll(".block-btn").forEach(b => b.addEventListener("click", async () => {
+        await window.KnotxmeAPI.updateUserStatus(b.dataset.id, b.dataset.status);
+        loadUsers();
+      }));
+      body.querySelectorAll(".del-btn").forEach(b => b.addEventListener("click", async () => {
+        if (!confirm("Delete this user permanently?")) return;
+        await window.KnotxmeAPI.deleteUser(b.dataset.id);
+        loadUsers();
+      }));
+    } catch (e) {
+      body.innerHTML = '<tr><td colspan="5" class="dash-empty">Could not load users.</td></tr>';
+    }
+  }
+  document.getElementById("userSearchBtn").addEventListener("click", loadUsers);
+
+  async function loadBrands() {
+    const body = document.getElementById("brandsTableBody");
+    try {
+      const brands = await window.KnotxmeAPI.getAllBrands();
+      body.innerHTML = brands.length ? brands.map(b => `<tr>
+        <td>${b.companyName || "—"}</td><td>${b.industry || "—"}</td><td>${b.contactPerson || "—"}</td>
+        <td>${b.location || "—"}</td><td>${statusBadge(b.status)}</td>
+      </tr>`).join("") : '<tr><td colspan="5" class="dash-empty">No brands yet.</td></tr>';
+    } catch (e) { body.innerHTML = '<tr><td colspan="5" class="dash-empty">Could not load brands.</td></tr>'; }
+  }
+
+  async function loadCreators() {
+    const body = document.getElementById("creatorsTableBody");
+    try {
+      const creators = await window.KnotxmeAPI.getAllCreators();
+      body.innerHTML = creators.length ? creators.map(c => `<tr>
+        <td>${c.name || "—"}</td><td>${c.niche || "—"}</td><td>${c.followers || 0}</td>
+        <td>${(c.platforms || []).join(", ") || "—"}</td><td>${statusBadge(c.status)}</td>
+      </tr>`).join("") : '<tr><td colspan="5" class="dash-empty">No creators yet.</td></tr>';
+    } catch (e) { body.innerHTML = '<tr><td colspan="5" class="dash-empty">Could not load creators.</td></tr>'; }
+  }
+
+  async function loadCampaigns() {
+    const body = document.getElementById("campaignsTableBody");
+    try {
+      const campaigns = await window.KnotxmeAPI.getAllCampaigns();
+      body.innerHTML = campaigns.length ? campaigns.map(c => `<tr>
+        <td>${c.campaignName}</td><td>${c.brandName || c.brandId || "—"}</td><td>${c.platform}</td>
+        <td>₹${c.budget}</td><td>${statusBadge(c.status)}</td><td>${new Date(c.dateCreated).toLocaleDateString()}</td>
+      </tr>`).join("") : '<tr><td colspan="6" class="dash-empty">No campaigns yet.</td></tr>';
+    } catch (e) { body.innerHTML = '<tr><td colspan="6" class="dash-empty">Could not load campaigns.</td></tr>'; }
+  }
+
+  ["Creators","Brands","Logins","Campaigns"].forEach(name => {
+    document.getElementById("export" + name).addEventListener("click", (e) => {
+      e.preventDefault();
+      const type = name.toLowerCase();
+      const url = window.KnotxmeAPI.exportData(type) + "?token=" + encodeURIComponent(window.KnotxmeAPI.getToken());
+      window.open(url, "_blank");
+    });
+  });
+
+  loadStats();
+</script>
+</body>
+</html>
