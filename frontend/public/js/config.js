@@ -9,6 +9,6 @@ window.KNOTXME_CONFIG = {
       return "http://localhost:5000/api";
     }
     // ⚠️ UPDATE THIS after you deploy your backend (see DEPLOYMENT.md)
-    return "https://YOUR-BACKEND-URL.onrender.com/api";
+    return "https://knotxme-backend.onrender.com/api";
   })(),
 };

@@ -33,7 +33,7 @@ app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/admin-login", authLimiter);
 app.use("/api/auth/forgot-password", authLimiter);
 
-// ---------- Routes ----------
+// ---------- Routes ----------~
 app.get("/api/health", (req, res) => res.json({ status: "ok", time: new Date().toISOString() }));
 
 app.use("/api/auth", authRoutes);
