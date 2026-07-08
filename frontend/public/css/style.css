@@ -128,26 +128,77 @@ transition:background .25s,color .25s,transform .25s;
 .nav-toggle{display:none;background:none;border:none;padding:6px;}
 .nav-toggle span{display:block;width:22px;height:2px;background:var(--ink);margin:5px 0;transition:transform .2s,opacity .2s;}
 @media (max-width:900px){
+
   .nav-links{
-    position:fixed;inset:66px 0 0 0;background:#ffffff;
-    flex-direction:column;align-items:flex-start;gap:12px;
-    padding:20px;
-    border-radius:0 0 16px 16px;
+    position:fixed;
+    top:66px;
+    left:0;
+    right:0;
+
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+
+    padding:18px;
+
+    background:rgba(250,247,242,.96);
+    backdrop-filter:blur(18px);
+
     border-top:1px solid var(--line);
-    box-shadow:0 15px 35px rgba(0,0,0,.12);
-    transform:translateY(-8px);opacity:0;pointer-events:none;
-    transition:opacity .18s ease, transform .18s ease;
+    border-radius:0 0 18px 18px;
+    box-shadow:0 18px 40px rgba(0,0,0,.12);
+
+    opacity:0;
+    pointer-events:none;
+    transform:translateY(-12px);
+
+    transition:opacity .22s ease, transform .22s ease;
+    z-index:999;
   }
+
+  .nav-links.open{
+    opacity:1;
+    pointer-events:auto;
+    transform:translateY(0);
+  }
+
   .nav-links a{
     display:block;
-    padding:12px 16px;
-    border-radius:8px;
-}
-  .nav-links.open{opacity:1;transform:translateY(0);pointer-events:auto;}
-  .nav-links a{width:100%;padding:14px 0;border-bottom:1px solid var(--line);}
-  .nav-cta .btn-outline{display:none;}
-  .nav-toggle{display:block;}
-}
+    width:100%;
+
+    padding:14px 18px;
+
+    background:#ffffff;
+
+    border:1px solid rgba(0,0,0,.06);
+    border-radius:12px;
+
+    font-weight:500;
+
+    transition:.2s ease;
+  }
+
+  .nav-links a:hover{
+    background:#101B33;
+    color:#fff;
+    transform:translateX(4px);
+  }
+
+  .nav-links a.active{
+    background:#101B33;
+    color:#fff;
+  }
+
+  .nav-cta .btn-outline{
+    display:none;
+  }
+
+  .nav-toggle{
+    display:block;
+  }
+
+} 
 .nav-early{
 padding:10px 18px !important;
 font-size:12px;
