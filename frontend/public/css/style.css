@@ -434,7 +434,17 @@ p
 .auth-area a{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-60);}
 .auth-area a:hover{color:var(--ink);}
 .auth-area .btn{padding:10px 18px;}
-@media (max-width:900px){.auth-area{display:none;}}
+@media (max-width:900px){.auth-area{
+display:flex;
+flex-direction:column;
+gap:10px;
+margin-top:15px;
+width:100%;
+}
+.auth-area .btn{
+width:100%;
+justify-content:center;
+}}
 
 /* ---------- Auth pages (login/signup/forgot/reset) ---------- */
 .auth-shell{min-height:calc(100vh - 300px);display:flex;align-items:center;justify-content:center;padding:70px 20px;}
