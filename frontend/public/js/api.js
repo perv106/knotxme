@@ -70,9 +70,48 @@
     // ---- Brand ----
     getBrandProfile: () => request("/brand/profile"),
     updateBrandProfile: (payload) => request("/brand/profile", { method: "PUT", body: payload }),
-    createBrief: (payload) => request("/brand/briefs", { method: "POST", body: payload }),
+    createBrief: async (payload) => {
+      try {
+        return await request("/brand/briefs", { method: "POST", body: payload });
+      } catch (err) {
+        if (err.status === 404) {
+          // Robust fallback for live backend during Render redeploy window
+          return await request("/brand/requirements", {
+            method: "POST",
+            body: {
+              campaignName: payload.title,
+              budget: payload.budget,
+              platform: payload.platform,
+              niche: "General",
+              description: payload.description,
+              deliverables: payload.deliverables || payload.guidelines,
+              deadline: payload.timeline,
+            },
+          });
+        }
+        throw err;
+      }
+    },
+    getMyBriefs: async () => {
+      try {
+        return await request("/brand/briefs");
+      } catch (err) {
+        if (err.status === 404) {
+          const reqs = await request("/brand/requirements");
+          return (reqs || []).map((r) => ({
+            _id: r._id,
+            title: r.campaignName || r.title,
+            platform: r.platform,
+            budget: r.budget,
+            status: r.status,
+            description: r.description,
+            dateCreated: r.dateCreated,
+          }));
+        }
+        throw err;
+      }
+    },
     createRequirement: (payload) => request("/brand/briefs", { method: "POST", body: payload }),
-    getMyBriefs: () => request("/brand/briefs"),
     getMyRequirements: () => request("/brand/briefs"),
     getBrandStats: () => request("/brand/stats"),
 
@@ -80,7 +119,14 @@
     getCreatorProfile: () => request("/creator/profile"),
     updateCreatorProfile: (payload) => request("/creator/profile", { method: "PUT", body: payload }),
     createCreatorPost: (payload) => request("/creator/posts", { method: "POST", body: payload }),
-    getMyPosts: () => request("/creator/posts"),
+    getMyPosts: async () => {
+      try {
+        return await request("/creator/posts");
+      } catch (err) {
+        if (err.status === 404) return [];
+        throw err;
+      }
+    },
     updateCreatorPost: (id, payload) => request("/creator/posts/" + id, { method: "PUT", body: payload }),
     deleteCreatorPost: (id) => request("/creator/posts/" + id, { method: "DELETE" }),
     getMyCampaigns: () => request("/creator/campaigns"),
@@ -88,10 +134,24 @@
 
     // ---- Admin ----
     getAdminStats: () => request("/admin/stats"),
-    getAllBriefs: () => request("/admin/briefs"),
+    getAllBriefs: async () => {
+      try {
+        return await request("/admin/briefs");
+      } catch (err) {
+        if (err.status === 404) return await request("/admin/campaigns");
+        throw err;
+      }
+    },
     getAllCampaigns: () => request("/admin/briefs"),
     updateBriefStatus: (id, payload) => request("/admin/briefs/" + id, { method: "PUT", body: payload }),
-    getAllCreatorPosts: () => request("/admin/creator-posts"),
+    getAllCreatorPosts: async () => {
+      try {
+        return await request("/admin/creator-posts");
+      } catch (err) {
+        if (err.status === 404) return [];
+        throw err;
+      }
+    },
     getAllUsers: (query) => request("/admin/users" + (query || "")),
     getAllBrands: () => request("/admin/brands"),
     getAllCreators: () => request("/admin/creators"),
