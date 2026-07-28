@@ -17,10 +17,9 @@
     <a href="index.html" class="logo"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 10c4-6 12-6 16 0s-2 12-6 12-8-4-8-8 4-6 8-4 4 8-2 10-10-2-8-10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>KNOT<b>X</b>ME</a>
     <nav class="dash-nav">
       <a href="#" data-tab="dashboard" class="active">Dashboard</a>
+      <a href="#" data-tab="campaigns">My Campaigns</a>
+      <a href="#" data-tab="posts">My Content Posts</a>
       <a href="#" data-tab="profile">My Profile</a>
-      <a href="#" data-tab="opportunities">Available Opportunities</a>
-      <a href="#" data-tab="accepted">Accepted Campaigns</a>
-      <a href="#" data-tab="previous">Previous Campaigns</a>
       <a href="#" data-tab="settings">Settings</a>
     </nav>
     <div class="dash-user">
@@ -34,13 +33,50 @@
     <section id="tab-dashboard" class="dash-tab">
       <div class="dash-head"><h1>Welcome back<span id="welcomeName"></span></h1></div>
       <div class="dash-stats" id="statsRow">
-        <div class="dash-stat"><div class="num">—</div><div class="label">Accepted Campaigns</div></div>
-        <div class="dash-stat"><div class="num">—</div><div class="label">Completed Campaigns</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Assigned Campaigns</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Published Posts</div></div>
         <div class="dash-stat"><div class="num">—</div><div class="label">Profile Completion</div></div>
       </div>
       <div class="dash-panel">
-        <h2>New Opportunities For You</h2>
-        <div id="recentOpps" class="loading-row">Loading…</div>
+        <h2>Assigned Campaigns</h2>
+        <div id="recentCampaigns" class="loading-row">Loading…</div>
+      </div>
+    </section>
+
+    <section id="tab-campaigns" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>My Assigned Campaigns</h1></div>
+      <div class="dash-panel">
+        <p style="color:var(--ink-60);margin-bottom:20px;">Campaigns assigned to you by the KnotXMe Admin team.</p>
+        <div id="assignedCampaignsList" class="loading-row">Loading…</div>
+      </div>
+    </section>
+
+    <section id="tab-posts" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>My Content Posts</h1></div>
+      <div class="dash-panel">
+        <h2>Create New Content Post</h2>
+        <form id="postForm" style="margin-bottom:30px;">
+          <div class="grid-2" style="gap:20px;">
+            <div class="form-field"><label>Post Title</label><input type="text" id="post-title" placeholder="e.g. Summer Styling Reel Preview" required></div>
+            <div class="form-field">
+              <label>Platform</label>
+              <select id="post-platform"><option>Instagram</option><option>YouTube</option><option>TikTok</option><option>Blog / Newsletter</option><option>X (Twitter)</option></select>
+            </div>
+            <div class="form-field"><label>External Post URL</label><input type="url" id="post-externalUrl" placeholder="https://instagram.com/p/..."></div>
+            <div class="form-field"><label>Media Image / Video URL</label><input type="url" id="post-mediaUrl" placeholder="https://..."></div>
+            <div class="form-field">
+              <label>Status</label>
+              <select id="post-status"><option value="Published">Published</option><option value="Draft">Draft</option><option value="Scheduled">Scheduled</option></select>
+            </div>
+          </div>
+          <div class="form-field"><label>Caption / Post Content</label><textarea id="post-caption" placeholder="The exact caption, text, or script you are posting online..." required></textarea></div>
+          <button type="submit" class="btn btn-primary">Save &amp; Publish Content Post</button>
+          <div class="auth-success" id="postSuccess"></div>
+          <div class="auth-error" id="postError"></div>
+        </form>
+        <hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+        <h2>Your Published &amp; Draft Posts</h2>
+        <div id="creatorPostsList" class="loading-row">Loading…</div>
       </div>
     </section>
 
@@ -72,38 +108,10 @@
       </div>
     </section>
 
-    <section id="tab-opportunities" class="dash-tab" style="display:none;">
-      <div class="dash-head"><h1>Available Opportunities</h1></div>
-      <div class="filter-bar">
-        <select id="f-niche"><option value="">All Niches</option><option>Fashion</option><option>Tech</option><option>Gaming</option><option>Fitness</option><option>Beauty</option><option>Food</option><option>Finance</option></select>
-        <select id="f-platform"><option value="">All Platforms</option><option>Instagram</option><option>YouTube</option><option>Blog / Newsletter</option></select>
-        <input type="text" id="f-location" placeholder="Location">
-        <input type="number" id="f-minBudget" placeholder="Min budget (₹)">
-        <button class="btn btn-outline" id="applyFilters">Apply Filters</button>
-      </div>
-      <div id="oppsList" class="loading-row">Loading…</div>
-    </section>
-
-    <section id="tab-accepted" class="dash-tab" style="display:none;">
-      <div class="dash-head"><h1>Accepted Campaigns</h1></div>
-      <div class="dash-panel">
-        <div id="acceptedList" class="loading-row">Loading…</div>
-      </div>
-    </section>
-
-    <section id="tab-previous" class="dash-tab" style="display:none;">
-      <div class="dash-head"><h1>Previous Campaigns</h1></div>
-      <div class="dash-panel">
-        <table class="dash-table">
-          <thead><tr><th>Campaign</th><th>Brand</th><th>Platform</th><th>Status</th></tr></thead>
-          <tbody id="prevTableBody"><tr><td colspan="4" class="loading-row">Loading…</td></tr></tbody>
-        </table>
-      </div>
-    </section>
-
     <section id="tab-settings" class="dash-tab" style="display:none;">
       <div class="dash-head"><h1>Settings</h1></div>
       <div class="dash-panel">
+        <p style="color:var(--ink-60);margin-bottom:16px;">Account status and security options.</p>
         <p><a href="forgot-password.html">Change / reset your password →</a></p>
       </div>
     </section>
@@ -127,98 +135,123 @@
       document.querySelectorAll(".dash-nav a").forEach((x) => x.classList.remove("active"));
       document.getElementById("tab-" + a.dataset.tab).style.display = "block";
       a.classList.add("active");
-      if (a.dataset.tab === "opportunities") loadOpportunities();
     });
   });
+
+  function statusPill(status) {
+    const cls = status === "Published" || status === "Matched" || status === "Completed" ? "published" : status === "Draft" ? "draft" : "submitted";
+    return `<span class="status-pill ${cls}">${status}</span>`;
+  }
 
   async function loadStats() {
     try {
       const s = await window.KnotxmeAPI.getCreatorStats();
       const nums = document.querySelectorAll("#statsRow .num");
-      nums[0].textContent = s.acceptedCampaigns;
-      nums[1].textContent = s.completedCampaigns;
-      nums[2].textContent = s.profileCompletion + "%";
+      nums[0].textContent = s.assignedCampaigns || 0;
+      nums[1].textContent = s.publishedPosts || 0;
+      nums[2].textContent = (s.profileCompletion || 0) + "%";
     } catch (e) {}
   }
 
-  function oppCard(o, showAccept) {
-    return `<div class="opp-card">
-      <h3>${o.campaignName}</h3>
-      <p style="color:var(--ink-60);margin-top:6px;font-size:14px;">${o.description || ""}</p>
-      <div class="meta">
-        <span class="tag">${o.platform}</span>
-        <span class="tag gold">₹${o.budget}</span>
-        <span class="tag teal">${o.niche}</span>
-        ${o.followersRequired ? `<span class="tag">${o.followersRequired} followers</span>` : ""}
-      </div>
-      ${showAccept ? `<div style="margin-top:16px;"><button class="btn btn-primary accept-btn" data-id="${o._id}">Accept Campaign</button></div>` : ""}
-    </div>`;
-  }
-
-  async function loadOpportunities() {
-    const listEl = document.getElementById("oppsList");
-    listEl.innerHTML = '<div class="loading-row">Loading…</div>';
-    const params = new URLSearchParams();
-    const niche = document.getElementById("f-niche").value;
-    const platform = document.getElementById("f-platform").value;
-    const location = document.getElementById("f-location").value;
-    const minBudget = document.getElementById("f-minBudget").value;
-    if (niche) params.set("niche", niche);
-    if (platform) params.set("platform", platform);
-    if (location) params.set("location", location);
-    if (minBudget) params.set("minBudget", minBudget);
-    const qs = params.toString() ? "?" + params.toString() : "";
-
+  async function loadMyPosts() {
+    const listEl = document.getElementById("creatorPostsList");
     try {
-      const opps = await window.KnotxmeAPI.getOpportunities(qs);
-      const recentEl = document.getElementById("recentOpps");
-      if (!opps.length) {
-        listEl.innerHTML = '<div class="dash-empty">No matching opportunities right now — check back soon.</div>';
-        if (recentEl) recentEl.innerHTML = '<div class="dash-empty">No opportunities yet.</div>';
+      const posts = await window.KnotxmeAPI.getMyPosts();
+      if (!posts.length) {
+        listEl.innerHTML = '<div class="dash-empty">No content posts yet — draft or publish your first post above.</div>';
         return;
       }
-      listEl.innerHTML = opps.map(o => oppCard(o, true)).join("");
-      if (recentEl) recentEl.innerHTML = opps.slice(0, 3).map(o => oppCard(o, false)).join("");
 
-      listEl.querySelectorAll(".accept-btn").forEach(btn => {
+      listEl.innerHTML = posts.map(p => `
+        <div class="opp-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <h3>${p.title}</h3>
+            ${statusPill(p.status)}
+          </div>
+          <p style="color:var(--ink-60);font-size:14px;margin-top:8px;white-space:pre-wrap;">${p.caption}</p>
+          <div class="meta" style="margin-top:12px;">
+            <span class="tag">${p.platform}</span>
+            ${p.externalPostUrl ? `<a href="${p.externalPostUrl}" target="_blank" class="tag gold">View Live Post ↗</a>` : ""}
+            ${p.mediaUrl ? `<a href="${p.mediaUrl}" target="_blank" class="tag teal">Media Asset ↗</a>` : ""}
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;">
+            <button class="btn btn-outline del-post-btn" data-id="${p._id}" style="padding:6px 12px;font-size:11px;">Delete Post</button>
+          </div>
+        </div>
+      `).join("");
+
+      listEl.querySelectorAll(".del-post-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
-          btn.disabled = true;
-          btn.textContent = "Accepting…";
+          if (!confirm("Are you sure you want to delete this post?")) return;
           try {
-            await window.KnotxmeAPI.acceptCampaign(btn.dataset.id);
-            btn.textContent = "Accepted ✓";
+            await window.KnotxmeAPI.deleteCreatorPost(btn.dataset.id);
+            loadMyPosts();
             loadStats();
-            loadAccepted();
           } catch (e) {
-            btn.textContent = "Accept Campaign";
-            btn.disabled = false;
+            alert("Could not delete post.");
           }
         });
       });
     } catch (e) {
-      listEl.textContent = "Could not load opportunities.";
+      listEl.textContent = "Could not load content posts.";
     }
   }
 
-  document.getElementById("applyFilters").addEventListener("click", loadOpportunities);
-
-  async function loadAccepted() {
-    const el = document.getElementById("acceptedList");
+  document.getElementById("postForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const okEl = document.getElementById("postSuccess");
+    const errEl = document.getElementById("postError");
+    okEl.classList.remove("show"); errEl.classList.remove("show");
+    const payload = {
+      title: document.getElementById("post-title").value,
+      platform: document.getElementById("post-platform").value,
+      externalPostUrl: document.getElementById("post-externalUrl").value,
+      mediaUrl: document.getElementById("post-mediaUrl").value,
+      status: document.getElementById("post-status").value,
+      caption: document.getElementById("post-caption").value,
+    };
     try {
-      const campaigns = await window.KnotxmeAPI.getMyCampaigns();
-      const accepted = campaigns.filter(c => c.status === "Accepted" || c.status === "In Progress");
-      const previous = campaigns.filter(c => c.status === "Completed");
+      await window.KnotxmeAPI.createCreatorPost(payload);
+      okEl.textContent = "Content Post saved successfully.";
+      okEl.classList.add("show");
+      e.target.reset();
+      loadMyPosts();
+      loadStats();
+    } catch (err) {
+      errEl.textContent = "Could not create post. Check fields and try again.";
+      errEl.classList.add("show");
+    }
+  });
 
-      el.innerHTML = accepted.length
-        ? accepted.map(c => oppCard(c, false)).join("")
-        : '<div class="dash-empty">No accepted campaigns yet.</div>';
+  async function loadAssignedCampaigns() {
+    const listEl = document.getElementById("assignedCampaignsList");
+    const recentEl = document.getElementById("recentCampaigns");
+    try {
+      const briefs = await window.KnotxmeAPI.getMyCampaigns();
+      if (!briefs.length) {
+        listEl.innerHTML = '<div class="dash-empty">No active campaign assignments yet. The KnotXMe admin team will notify you when you are matched with a brand deal.</div>';
+        if (recentEl) recentEl.innerHTML = '<div class="dash-empty">No assigned campaigns.</div>';
+        return;
+      }
 
-      const prevBody = document.getElementById("prevTableBody");
-      prevBody.innerHTML = previous.length
-        ? previous.map(c => `<tr><td>${c.campaignName}</td><td>${c.brandName || "—"}</td><td>${c.platform}</td><td><span class="status-pill closed">Completed</span></td></tr>`).join("")
-        : '<tr><td colspan="4" class="dash-empty">No completed campaigns yet.</td></tr>';
+      const html = briefs.map(b => `
+        <div class="opp-card">
+          <h3>${b.title}</h3>
+          <div class="meta" style="margin-top:8px;">
+            <span class="tag">${b.platform}</span>
+            <span class="tag gold">₹${b.budget}</span>
+            ${statusPill(b.status)}
+          </div>
+          ${b.deliverables ? `<p style="margin-top:10px;font-size:13.5px;"><strong>Deliverables:</strong> ${b.deliverables}</p>` : ""}
+          ${b.timeline ? `<p style="margin-top:4px;font-size:13.5px;"><strong>Timeline:</strong> ${b.timeline}</p>` : ""}
+          ${b.guidelines ? `<p style="margin-top:4px;font-size:13.5px;"><strong>Guidelines:</strong> ${b.guidelines}</p>` : ""}
+        </div>
+      `).join("");
+
+      listEl.innerHTML = html;
+      if (recentEl) recentEl.innerHTML = html;
     } catch (e) {
-      el.textContent = "Could not load campaigns.";
+      listEl.textContent = "Could not load assigned campaigns.";
     }
   }
 
@@ -256,7 +289,7 @@
     };
     try {
       await window.KnotxmeAPI.updateCreatorProfile(payload);
-      okEl.textContent = "Profile saved.";
+      okEl.textContent = "Profile saved successfully.";
       okEl.classList.add("show");
       loadStats();
     } catch (err) {
@@ -266,8 +299,8 @@
   });
 
   loadStats();
-  loadOpportunities();
-  loadAccepted();
+  loadAssignedCampaigns();
+  loadMyPosts();
   loadProfile();
 </script>
 </body>

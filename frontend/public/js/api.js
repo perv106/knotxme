@@ -1,5 +1,4 @@
-// api.js — tiny fetch wrapper shared by login/signup/dashboard pages.
-// Depends on config.js being loaded first.
+// api.js — fetch wrapper shared across login/signup/dashboard pages.
 (function () {
   const BASE = window.KNOTXME_CONFIG.API_BASE_URL;
 
@@ -71,26 +70,33 @@
     // ---- Brand ----
     getBrandProfile: () => request("/brand/profile"),
     updateBrandProfile: (payload) => request("/brand/profile", { method: "PUT", body: payload }),
-    createRequirement: (payload) => request("/brand/requirements", { method: "POST", body: payload }),
-    getMyRequirements: () => request("/brand/requirements"),
+    createBrief: (payload) => request("/brand/briefs", { method: "POST", body: payload }),
+    createRequirement: (payload) => request("/brand/briefs", { method: "POST", body: payload }),
+    getMyBriefs: () => request("/brand/briefs"),
+    getMyRequirements: () => request("/brand/briefs"),
     getBrandStats: () => request("/brand/stats"),
 
     // ---- Creator ----
     getCreatorProfile: () => request("/creator/profile"),
     updateCreatorProfile: (payload) => request("/creator/profile", { method: "PUT", body: payload }),
-    getOpportunities: (query) => request("/creator/opportunities" + (query || "")),
-    acceptCampaign: (id) => request("/creator/opportunities/" + id + "/accept", { method: "POST" }),
+    createCreatorPost: (payload) => request("/creator/posts", { method: "POST", body: payload }),
+    getMyPosts: () => request("/creator/posts"),
+    updateCreatorPost: (id, payload) => request("/creator/posts/" + id, { method: "PUT", body: payload }),
+    deleteCreatorPost: (id) => request("/creator/posts/" + id, { method: "DELETE" }),
     getMyCampaigns: () => request("/creator/campaigns"),
     getCreatorStats: () => request("/creator/stats"),
 
     // ---- Admin ----
     getAdminStats: () => request("/admin/stats"),
+    getAllBriefs: () => request("/admin/briefs"),
+    getAllCampaigns: () => request("/admin/briefs"),
+    updateBriefStatus: (id, payload) => request("/admin/briefs/" + id, { method: "PUT", body: payload }),
+    getAllCreatorPosts: () => request("/admin/creator-posts"),
     getAllUsers: (query) => request("/admin/users" + (query || "")),
     getAllBrands: () => request("/admin/brands"),
     getAllCreators: () => request("/admin/creators"),
-    getAllCampaigns: () => request("/admin/campaigns"),
     updateUserStatus: (id, status) => request("/admin/users/" + id + "/status", { method: "PUT", body: { status } }),
     deleteUser: (id) => request("/admin/users/" + id, { method: "DELETE" }),
-    exportData: (type) => BASE + "/admin/export/" + type, // returns a URL to hit directly (file download)
+    exportData: (type) => BASE + "/admin/export/" + type,
   };
 })();

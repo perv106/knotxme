@@ -1,6 +1,6 @@
 const CreatorProfile = require("../models/CreatorProfile");
-const BrandProfile = require("../models/BrandProfile");
-const CampaignRequirement = require("../models/CampaignRequirement");
+const CreatorPost = require("../models/CreatorPost");
+const CampaignBrief = require("../models/CampaignBrief");
 
 async function getProfile(req, res, next) {
   try {
@@ -34,72 +34,90 @@ async function updateProfile(req, res, next) {
   }
 }
 
-// Privacy rule: creators only ever see OPEN campaign requirements (matched
-// opportunities), never a directory of brands or their private information.
-async function getOpportunities(req, res, next) {
-  try {
-    const { niche, platform, location, minBudget } = req.query;
-    const filter = { status: "Open" };
-    if (niche) filter.niche = new RegExp(niche, "i");
-    if (platform) filter.platform = platform;
-    if (minBudget) filter.budget = { $gte: Number(minBudget) };
-
-    let requirements = await CampaignRequirement.find(filter).sort({ dateCreated: -1 }).limit(100);
-
-    if (location) {
-      const brandIds = (await BrandProfile.find({ location: new RegExp(location, "i") }).select("_id")).map((b) => String(b._id));
-      requirements = requirements.filter((r) => brandIds.includes(String(r.brandId)));
-    }
-
-    res.json(requirements);
-  } catch (err) {
-    next(err);
-  }
-}
-
-async function acceptCampaign(req, res, next) {
+// Creator Posts CRUD
+async function createPost(req, res, next) {
   try {
     const profile = await CreatorProfile.findOne({ loginId: req.user._id });
     if (!profile) return res.status(404).json({ message: "Complete your creator profile first." });
 
-    const requirement = await CampaignRequirement.findById(req.params.id);
-    if (!requirement) return res.status(404).json({ message: "Opportunity not found." });
-    if (requirement.status !== "Open") {
-      return res.status(409).json({ message: "This opportunity is no longer available." });
+    const { title, caption, platform, mediaUrl, externalPostUrl, status } = req.body;
+    if (!title || !platform) {
+      return res.status(400).json({ message: "Title and platform are required." });
     }
 
-    requirement.status = "Accepted";
-    requirement.acceptedBy = profile._id;
-    await requirement.save();
+    const post = await CreatorPost.create({
+      creatorId: profile._id,
+      title,
+      caption: caption || "",
+      platform,
+      mediaUrl: mediaUrl || "",
+      externalPostUrl: externalPostUrl || "",
+      status: status || "Published",
+    });
 
-    profile.acceptedCampaigns.push(requirement._id);
-    await profile.save();
-
-    res.json(requirement);
+    res.status(201).json(post);
   } catch (err) {
     next(err);
   }
 }
 
+async function getMyPosts(req, res, next) {
+  try {
+    const profile = await CreatorProfile.findOne({ loginId: req.user._id });
+    if (!profile) return res.json([]);
+
+    const posts = await CreatorPost.find({ creatorId: profile._id }).sort({ dateCreated: -1 });
+    res.json(posts);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updatePost(req, res, next) {
+  try {
+    const profile = await CreatorProfile.findOne({ loginId: req.user._id });
+    if (!profile) return res.status(403).json({ message: "Unauthorized." });
+
+    const post = await CreatorPost.findOne({ _id: req.params.id, creatorId: profile._id });
+    if (!post) return res.status(404).json({ message: "Post not found." });
+
+    const allowed = ["title", "caption", "platform", "mediaUrl", "externalPostUrl", "status"];
+    allowed.forEach((k) => {
+      if (req.body[k] !== undefined) post[k] = req.body[k];
+    });
+
+    await post.save();
+    res.json(post);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function deletePost(req, res, next) {
+  try {
+    const profile = await CreatorProfile.findOne({ loginId: req.user._id });
+    if (!profile) return res.status(403).json({ message: "Unauthorized." });
+
+    const result = await CreatorPost.deleteOne({ _id: req.params.id, creatorId: profile._id });
+    if (result.deletedCount === 0) return res.status(404).json({ message: "Post not found." });
+
+    res.json({ message: "Post deleted successfully." });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Assigned Campaigns (Privacy-safe: only assigned/matched briefs)
 async function getMyCampaigns(req, res, next) {
   try {
     const profile = await CreatorProfile.findOne({ loginId: req.user._id });
     if (!profile) return res.json([]);
 
-    const campaigns = await CampaignRequirement.find({ acceptedBy: profile._id })
-      .populate("brandId", "companyName brandName")
+    const briefs = await CampaignBrief.find({ assignedCreators: profile._id })
+      .select("title platform budget status dateCreated deliverables guidelines timeline")
       .sort({ dateCreated: -1 });
 
-    const shaped = campaigns.map((c) => ({
-      _id: c._id,
-      campaignName: c.campaignName,
-      platform: c.platform,
-      budget: c.budget,
-      status: c.status,
-      brandName: c.brandId ? c.brandId.companyName || c.brandId.brandName : "—",
-    }));
-
-    res.json(shaped);
+    res.json(briefs);
   } catch (err) {
     next(err);
   }
@@ -108,15 +126,20 @@ async function getMyCampaigns(req, res, next) {
 async function getStats(req, res, next) {
   try {
     const profile = await CreatorProfile.findOne({ loginId: req.user._id });
-    if (!profile) return res.json({ acceptedCampaigns: 0, completedCampaigns: 0, profileCompletion: 0 });
+    if (!profile) return res.json({ assignedCampaigns: 0, publishedPosts: 0, profileCompletion: 0 });
+
+    const [assignedCount, postCount] = await Promise.all([
+      CampaignBrief.countDocuments({ assignedCreators: profile._id }),
+      CreatorPost.countDocuments({ creatorId: profile._id }),
+    ]);
 
     const fields = ["name", "username", "niche", "followers", "location", "portfolio"];
     const filled = fields.filter((f) => profile[f] && String(profile[f]).length > 0).length;
     const profileCompletion = Math.round((filled / fields.length) * 100);
 
     res.json({
-      acceptedCampaigns: profile.acceptedCampaigns.length,
-      completedCampaigns: profile.completedCampaigns.length,
+      assignedCampaigns: assignedCount,
+      publishedPosts: postCount,
       profileCompletion,
     });
   } catch (err) {
@@ -124,4 +147,8 @@ async function getStats(req, res, next) {
   }
 }
 
-module.exports = { getProfile, updateProfile, getOpportunities, acceptCampaign, getMyCampaigns, getStats };
+module.exports = {
+  getProfile, updateProfile,
+  createPost, getMyPosts, updatePost, deletePost,
+  getMyCampaigns, getStats,
+};

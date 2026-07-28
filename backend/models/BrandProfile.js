@@ -11,9 +11,7 @@ const brandProfileSchema = new mongoose.Schema(
     phone: { type: String, default: "" },
     socialLinks: { type: [String], default: [] },
     location: { type: String, default: "" },
-    currentRequirements: { type: [mongoose.Schema.Types.ObjectId], ref: "CampaignRequirement", default: [] },
-    previousRequirements: { type: [mongoose.Schema.Types.ObjectId], ref: "CampaignRequirement", default: [] },
-    campaignHistory: { type: [mongoose.Schema.Types.ObjectId], ref: "CampaignRequirement", default: [] },
+    briefs: [{ type: mongoose.Schema.Types.ObjectId, ref: "CampaignBrief" }],
     status: { type: String, enum: ["Active", "Blocked", "Suspended", "Pending"], default: "Active" },
   },
   { timestamps: true }

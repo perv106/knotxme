@@ -1,6 +1,4 @@
-// partials.js — injects the same header/footer used on the main site
-// into the new auth & dashboard pages, so the branding stays identical
-// without duplicating markup in every file.
+// partials.js — injects header/footer partials across auth pages.
 (function () {
   const HEADER = `
   <header class="site-header" id="siteHeader">
@@ -28,7 +26,7 @@
       <div class="footer-grid">
         <div>
           <div class="footer-logo"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 10c4-6 12-6 16 0s-2 12-6 12-8-4-8-8 4-6 8-4 4 8-2 10-10-2-8-10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Knotxme</div>
-          <p class="footer-tag">The tie between brands who need creators and creators who need brands. Built in India, currently in early development.</p>
+          <p class="footer-tag">The tie between brands who need creators and creators who need brands. Built in India — privacy-first creator marketplace.</p>
         </div>
         <div>
           <h5>Company</h5>
@@ -45,7 +43,7 @@
         <div>
           <h5>Reach us</h5>
           <a href="mailto:hello@Knotxme.in">hello@Knotxme.in</a>
-          <a href="index.html#contact">Early access form</a>
+          <a href="index.html#contact">Contact &amp; Support</a>
           <a href="index.html#contact">Instagram &amp; LinkedIn</a>
         </div>
       </div>
@@ -62,7 +60,6 @@
     if (hMount) hMount.outerHTML = HEADER;
     if (fMount) fMount.outerHTML = FOOTER;
 
-    // re-run nav toggle + scroll-shrink behavior now that header exists
     const toggle = document.getElementById("navToggle");
     const navLinks = document.getElementById("navLinks");
     if (toggle && navLinks) {
@@ -78,7 +75,6 @@
       onScroll();
     }
     if (window.KnotxmeAPI && document.getElementById("authArea")) {
-      // trigger auth-nav rendering logic manually since DOMContentLoaded already fired once
       const evt = new Event("knotxme:navready");
       document.dispatchEvent(evt);
     }

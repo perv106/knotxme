@@ -1,5 +1,5 @@
 const BrandProfile = require("../models/BrandProfile");
-const CampaignRequirement = require("../models/CampaignRequirement");
+const CampaignBrief = require("../models/CampaignBrief");
 
 async function getProfile(req, res, next) {
   try {
@@ -32,41 +32,45 @@ async function updateProfile(req, res, next) {
   }
 }
 
-// A brand never loses previous submissions — every requirement is a new record.
-async function createRequirement(req, res, next) {
+async function createBrief(req, res, next) {
   try {
     const profile = await BrandProfile.findOne({ loginId: req.user._id });
     if (!profile) return res.status(404).json({ message: "Complete your brand profile first." });
 
-    const { campaignName, budget, platform, niche, followersRequired, description, deliverables, deadline } = req.body;
+    const { title, description, deliverables, platform, budget, timeline, guidelines, ndaNotes } = req.body;
 
-    if (!campaignName || !budget || !platform || !niche || !description) {
-      return res.status(400).json({ message: "Campaign name, budget, platform, niche and description are required." });
+    if (!title || !description || !platform || !budget) {
+      return res.status(400).json({ message: "Title, description, platform, and budget are required." });
     }
 
-    const requirement = await CampaignRequirement.create({
+    const brief = await CampaignBrief.create({
       brandId: profile._id,
-      campaignName, budget, platform, niche,
-      followersRequired, description, deliverables,
-      deadline: deadline || undefined,
+      title,
+      description,
+      deliverables: deliverables || "",
+      platform,
+      budget: Number(budget),
+      timeline: timeline || "",
+      guidelines: guidelines || "",
+      ndaNotes: ndaNotes || "",
+      status: "Submitted",
     });
 
-    profile.currentRequirements.push(requirement._id);
-    profile.campaignHistory.push(requirement._id);
+    profile.briefs.push(brief._id);
     await profile.save();
 
-    res.status(201).json(requirement);
+    res.status(201).json(brief);
   } catch (err) {
     next(err);
   }
 }
 
-async function getMyRequirements(req, res, next) {
+async function getMyBriefs(req, res, next) {
   try {
     const profile = await BrandProfile.findOne({ loginId: req.user._id });
     if (!profile) return res.json([]);
-    const reqs = await CampaignRequirement.find({ brandId: profile._id }).sort({ dateCreated: -1 });
-    res.json(reqs);
+    const briefs = await CampaignBrief.find({ brandId: profile._id }).sort({ dateCreated: -1 });
+    res.json(briefs);
   } catch (err) {
     next(err);
   }
@@ -75,17 +79,17 @@ async function getMyRequirements(req, res, next) {
 async function getStats(req, res, next) {
   try {
     const profile = await BrandProfile.findOne({ loginId: req.user._id });
-    if (!profile) return res.json({ totalCampaigns: 0, activeCampaigns: 0, completedCampaigns: 0 });
+    if (!profile) return res.json({ totalBriefs: 0, activeBriefs: 0, completedBriefs: 0 });
 
-    const all = await CampaignRequirement.find({ brandId: profile._id });
+    const briefs = await CampaignBrief.find({ brandId: profile._id });
     res.json({
-      totalCampaigns: all.length,
-      activeCampaigns: all.filter((c) => ["Open", "Pending", "Accepted", "In Progress"].includes(c.status)).length,
-      completedCampaigns: all.filter((c) => c.status === "Completed").length,
+      totalBriefs: briefs.length,
+      activeBriefs: briefs.filter((b) => ["Submitted", "Under Review", "Matched", "In Progress"].includes(b.status)).length,
+      completedBriefs: briefs.filter((b) => b.status === "Completed").length,
     });
   } catch (err) {
     next(err);
   }
 }
 
-module.exports = { getProfile, updateProfile, createRequirement, getMyRequirements, getStats };
+module.exports = { getProfile, updateProfile, createBrief, getMyBriefs, getStats };

@@ -17,10 +17,9 @@
     <a href="index.html" class="logo"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 10c4-6 12-6 16 0s-2 12-6 12-8-4-8-8 4-6 8-4 4 8-2 10-10-2-8-10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>KNOT<b>X</b>ME</a>
     <nav class="dash-nav">
       <a href="#" data-tab="dashboard" class="active">Dashboard</a>
+      <a href="#" data-tab="create">Create Campaign Brief</a>
+      <a href="#" data-tab="briefs">My Campaign Briefs</a>
       <a href="#" data-tab="profile">My Profile</a>
-      <a href="#" data-tab="create">Create New Requirement</a>
-      <a href="#" data-tab="requirements">My Previous Requirements</a>
-      <a href="#" data-tab="status">Campaign Status</a>
       <a href="#" data-tab="settings">Settings</a>
     </nav>
     <div class="dash-user">
@@ -31,18 +30,59 @@
 
   <main class="dash-main">
 
+    <!-- Privacy Banner -->
+    <div class="privacy-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div><strong>Privacy Guarantee:</strong> Creators are matched manually by the KnotXMe team to ensure quality and privacy. Your campaign briefs and contact info are visible strictly to Admins.</div>
+    </div>
+
     <section id="tab-dashboard" class="dash-tab">
       <div class="dash-head">
         <h1>Welcome back<span id="welcomeName"></span></h1>
       </div>
       <div class="dash-stats" id="statsRow">
-        <div class="dash-stat"><div class="num">—</div><div class="label">Total Campaigns Posted</div></div>
-        <div class="dash-stat"><div class="num">—</div><div class="label">Active Campaigns</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Total Briefs Submitted</div></div>
+        <div class="dash-stat"><div class="num">—</div><div class="label">Active Briefs</div></div>
         <div class="dash-stat"><div class="num">—</div><div class="label">Completed Campaigns</div></div>
       </div>
       <div class="dash-panel">
-        <h2>Most Recent Requirements</h2>
-        <div id="recentReqs" class="loading-row">Loading…</div>
+        <h2>Recent Campaign Briefs</h2>
+        <div id="recentBriefs" class="loading-row">Loading…</div>
+      </div>
+    </section>
+
+    <section id="tab-create" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>Create Campaign Brief</h1></div>
+      <div class="dash-panel">
+        <p style="color:var(--ink-60);margin-bottom:20px;">Submit a confidential brief containing key requirements. Only Admins can view this post to match the right creators for your brand deal.</p>
+        <form id="briefForm">
+          <div class="grid-2" style="gap:20px;">
+            <div class="form-field"><label>Campaign Title</label><input type="text" id="b-title" placeholder="e.g. Summer Skincare Product Launch" required></div>
+            <div class="form-field"><label>Budget (₹)</label><input type="number" id="b-budget" placeholder="e.g. 50000" required></div>
+            <div class="form-field">
+              <label>Target Platform</label>
+              <select id="b-platform"><option>Instagram</option><option>YouTube</option><option>TikTok</option><option>Blog / Newsletter</option><option>X (Twitter)</option></select>
+            </div>
+            <div class="form-field"><label>Timeline / Deadline</label><input type="text" id="b-timeline" placeholder="e.g. 2 weeks / By Aug 15"></div>
+          </div>
+          <div class="form-field"><label>Campaign Description</label><textarea id="b-description" placeholder="Describe your campaign goals and requirements..." required></textarea></div>
+          <div class="form-field"><label>Deliverables</label><textarea id="b-deliverables" placeholder="e.g. 1 Instagram Reel, 2 Stories, raw video rights"></textarea></div>
+          <div class="form-field"><label>Brand Guidelines & Visual Style</label><textarea id="b-guidelines" placeholder="Tone of voice, logo usage, do's & don'ts..."></textarea></div>
+          <div class="form-field"><label>NDA / Confidential Notes (Admin-Only)</label><textarea id="b-ndaNotes" placeholder="Confidential budget flexibility, strict non-compete terms, or internal notes..."></textarea></div>
+          <button type="submit" class="btn btn-primary">Submit Campaign Brief (Admin-Only)</button>
+          <div class="auth-success" id="briefSuccess"></div>
+          <div class="auth-error" id="briefError"></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="tab-briefs" class="dash-tab" style="display:none;">
+      <div class="dash-head"><h1>My Campaign Briefs</h1></div>
+      <div class="dash-panel">
+        <table class="dash-table">
+          <thead><tr><th>Brief Title</th><th>Platform</th><th>Budget</th><th>Status</th><th>Submitted</th></tr></thead>
+          <tbody id="briefsTableBody"><tr><td colspan="5" class="loading-row">Loading…</td></tr></tbody>
+        </table>
       </div>
     </section>
 
@@ -66,47 +106,6 @@
       </div>
     </section>
 
-    <section id="tab-create" class="dash-tab" style="display:none;">
-      <div class="dash-head"><h1>Create New Requirement</h1></div>
-      <div class="dash-panel">
-        <form id="requirementForm">
-          <div class="grid-2" style="gap:20px;">
-            <div class="form-field"><label>Campaign Name</label><input type="text" id="r-campaignName" required></div>
-            <div class="form-field"><label>Budget (₹)</label><input type="number" id="r-budget" required></div>
-            <div class="form-field">
-              <label>Platform</label>
-              <select id="r-platform"><option>Instagram</option><option>YouTube</option><option>Blog / Newsletter</option></select>
-            </div>
-            <div class="form-field"><label>Niche</label><input type="text" id="r-niche" required></div>
-            <div class="form-field"><label>Followers Required</label><input type="text" id="r-followers" placeholder="e.g. 10K+"></div>
-            <div class="form-field"><label>Deadline</label><input type="date" id="r-deadline"></div>
-          </div>
-          <div class="form-field"><label>Description</label><textarea id="r-description" required></textarea></div>
-          <div class="form-field"><label>Deliverables</label><textarea id="r-deliverables"></textarea></div>
-          <button type="submit" class="btn btn-primary">Submit Requirement</button>
-          <div class="auth-success" id="reqSuccess"></div>
-          <div class="auth-error" id="reqError"></div>
-        </form>
-      </div>
-    </section>
-
-    <section id="tab-requirements" class="dash-tab" style="display:none;">
-      <div class="dash-head"><h1>My Previous Requirements</h1></div>
-      <div class="dash-panel">
-        <table class="dash-table">
-          <thead><tr><th>Campaign</th><th>Platform</th><th>Budget</th><th>Status</th><th>Created</th></tr></thead>
-          <tbody id="reqTableBody"><tr><td colspan="5" class="loading-row">Loading…</td></tr></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section id="tab-status" class="dash-tab" style="display:none;">
-      <div class="dash-head"><h1>Campaign Status</h1></div>
-      <div class="dash-panel">
-        <div id="statusList" class="loading-row">Loading…</div>
-      </div>
-    </section>
-
     <section id="tab-settings" class="dash-tab" style="display:none;">
       <div class="dash-head"><h1>Settings</h1></div>
       <div class="dash-panel">
@@ -127,7 +126,6 @@
   document.getElementById("userLabel").textContent = user.email + " · Brand";
   document.getElementById("welcomeName").textContent = ", " + (user.name || "");
 
-  // Tab switching
   document.querySelectorAll(".dash-nav a[data-tab]").forEach((a) => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -139,7 +137,7 @@
   });
 
   function statusPill(status) {
-    const cls = status === "Open" ? "open" : status === "Closed" ? "closed" : "pending";
+    const cls = status === "Matched" || status === "Completed" ? "published" : status === "Submitted" || status === "Under Review" ? "submitted" : "draft";
     return `<span class="status-pill ${cls}">${status}</span>`;
   }
 
@@ -147,40 +145,42 @@
     try {
       const stats = await window.KnotxmeAPI.getBrandStats();
       const nums = document.querySelectorAll("#statsRow .num");
-      nums[0].textContent = stats.totalCampaigns;
-      nums[1].textContent = stats.activeCampaigns;
-      nums[2].textContent = stats.completedCampaigns;
-    } catch (e) { /* leave placeholders */ }
+      nums[0].textContent = stats.totalBriefs || 0;
+      nums[1].textContent = stats.activeBriefs || 0;
+      nums[2].textContent = stats.completedBriefs || 0;
+    } catch (e) {}
   }
 
-  async function loadRequirements() {
+  async function loadBriefs() {
     try {
-      const reqs = await window.KnotxmeAPI.getMyRequirements();
-      const recentEl = document.getElementById("recentReqs");
-      const bodyEl = document.getElementById("reqTableBody");
-      const statusEl = document.getElementById("statusList");
+      const briefs = await window.KnotxmeAPI.getMyBriefs();
+      const recentEl = document.getElementById("recentBriefs");
+      const bodyEl = document.getElementById("briefsTableBody");
 
-      if (!reqs.length) {
-        recentEl.innerHTML = '<div class="dash-empty">No requirements yet — create your first one.</div>';
-        bodyEl.innerHTML = '<tr><td colspan="5" class="dash-empty">Nothing here yet.</td></tr>';
-        statusEl.innerHTML = '<div class="dash-empty">No active campaigns.</div>';
+      if (!briefs.length) {
+        recentEl.innerHTML = '<div class="dash-empty">No campaign briefs submitted yet.</div>';
+        bodyEl.innerHTML = '<tr><td colspan="5" class="dash-empty">No campaign briefs found.</td></tr>';
         return;
       }
 
-      recentEl.innerHTML = reqs.slice(0, 3).map(r =>
-        `<div class="opp-card"><h3>${r.campaignName}</h3><div class="meta"><span class="tag">${r.platform}</span><span class="tag gold">₹${r.budget}</span>${statusPill(r.status)}</div></div>`
+      recentEl.innerHTML = briefs.slice(0, 3).map(b =>
+        `<div class="opp-card">
+          <h3>${b.title} <span class="status-pill closed" style="font-size:10px;">Admin Only</span></h3>
+          <p style="color:var(--ink-60);font-size:13.5px;margin-top:4px;">${b.description.substring(0, 100)}...</p>
+          <div class="meta">
+            <span class="tag">${b.platform}</span>
+            <span class="tag gold">₹${b.budget}</span>
+            ${statusPill(b.status)}
+          </div>
+        </div>`
       ).join("");
 
-      bodyEl.innerHTML = reqs.map(r => `<tr>
-        <td>${r.campaignName}</td><td>${r.platform}</td><td>₹${r.budget}</td>
-        <td>${statusPill(r.status)}</td><td>${new Date(r.dateCreated).toLocaleDateString()}</td>
+      bodyEl.innerHTML = briefs.map(b => `<tr>
+        <td><strong>${b.title}</strong></td><td>${b.platform}</td><td>₹${b.budget}</td>
+        <td>${statusPill(b.status)}</td><td>${new Date(b.dateCreated).toLocaleDateString()}</td>
       </tr>`).join("");
-
-      statusEl.innerHTML = reqs.map(r =>
-        `<div class="opp-card"><h3>${r.campaignName}</h3>${statusPill(r.status)}</div>`
-      ).join("");
     } catch (e) {
-      document.getElementById("recentReqs").textContent = "Could not load requirements.";
+      document.getElementById("recentBriefs").textContent = "Could not load campaign briefs.";
     }
   }
 
@@ -210,7 +210,7 @@
     };
     try {
       await window.KnotxmeAPI.updateBrandProfile(payload);
-      okEl.textContent = "Profile saved.";
+      okEl.textContent = "Profile saved successfully.";
       okEl.classList.add("show");
     } catch (err) {
       okEl.textContent = "Could not save profile.";
@@ -218,36 +218,36 @@
     }
   });
 
-  document.getElementById("requirementForm").addEventListener("submit", async (e) => {
+  document.getElementById("briefForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const okEl = document.getElementById("reqSuccess");
-    const errEl = document.getElementById("reqError");
+    const okEl = document.getElementById("briefSuccess");
+    const errEl = document.getElementById("briefError");
     okEl.classList.remove("show"); errEl.classList.remove("show");
     const payload = {
-      campaignName: document.getElementById("r-campaignName").value,
-      budget: document.getElementById("r-budget").value,
-      platform: document.getElementById("r-platform").value,
-      niche: document.getElementById("r-niche").value,
-      followersRequired: document.getElementById("r-followers").value,
-      description: document.getElementById("r-description").value,
-      deliverables: document.getElementById("r-deliverables").value,
-      deadline: document.getElementById("r-deadline").value,
+      title: document.getElementById("b-title").value,
+      budget: document.getElementById("b-budget").value,
+      platform: document.getElementById("b-platform").value,
+      timeline: document.getElementById("b-timeline").value,
+      description: document.getElementById("b-description").value,
+      deliverables: document.getElementById("b-deliverables").value,
+      guidelines: document.getElementById("b-guidelines").value,
+      ndaNotes: document.getElementById("b-ndaNotes").value,
     };
     try {
-      await window.KnotxmeAPI.createRequirement(payload);
-      okEl.textContent = "Requirement submitted.";
+      await window.KnotxmeAPI.createBrief(payload);
+      okEl.textContent = "Campaign Brief submitted securely to Admin.";
       okEl.classList.add("show");
       e.target.reset();
-      loadRequirements();
+      loadBriefs();
       loadStats();
     } catch (err) {
-      errEl.textContent = "Could not submit requirement. Please check the form.";
+      errEl.textContent = "Could not submit brief. Please check the required fields.";
       errEl.classList.add("show");
     }
   });
 
   loadStats();
-  loadRequirements();
+  loadBriefs();
   loadProfile();
 </script>
 </body>

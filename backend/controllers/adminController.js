@@ -1,24 +1,25 @@
 const Login = require("../models/Login");
 const BrandProfile = require("../models/BrandProfile");
 const CreatorProfile = require("../models/CreatorProfile");
-const CampaignRequirement = require("../models/CampaignRequirement");
+const CampaignBrief = require("../models/CampaignBrief");
+const CreatorPost = require("../models/CreatorPost");
 const { sendExcel } = require("../utils/exportExcel");
 
 async function getStats(req, res, next) {
   try {
-    const [totalUsers, totalBrands, totalCreators, totalCampaigns, activeUsers, blockedUsers] = await Promise.all([
+    const [totalUsers, totalBrands, totalCreators, totalBriefs, totalPosts, activeUsers, blockedUsers] = await Promise.all([
       Login.countDocuments(),
       Login.countDocuments({ role: "brand" }),
       Login.countDocuments({ role: "creator" }),
-      CampaignRequirement.countDocuments(),
+      CampaignBrief.countDocuments(),
+      CreatorPost.countDocuments(),
       Login.countDocuments({ accountStatus: "Active" }),
       Login.countDocuments({ accountStatus: "Blocked" }),
     ]);
 
     const recentRegistrations = await Login.find().sort({ createdDate: -1 }).limit(5).select("email role createdDate");
-    const recentRequirements = await CampaignRequirement.find().sort({ dateCreated: -1 }).limit(5).select("campaignName budget dateCreated");
+    const recentBriefs = await CampaignBrief.find().sort({ dateCreated: -1 }).limit(5).select("title budget dateCreated status");
 
-    // Monthly registrations for the last 6 months
     const now = new Date();
     const months = [];
     for (let i = 5; i >= 0; i--) {
@@ -35,9 +36,83 @@ async function getStats(req, res, next) {
     );
 
     res.json({
-      totalUsers, totalBrands, totalCreators, totalCampaigns, activeUsers, blockedUsers,
-      recentRegistrations, recentRequirements, monthlyRegistrations,
+      totalUsers, totalBrands, totalCreators, totalBriefs, totalPosts, activeUsers, blockedUsers,
+      recentRegistrations, recentBriefs, monthlyRegistrations,
     });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getAllBriefs(req, res, next) {
+  try {
+    const briefs = await CampaignBrief.find()
+      .populate("brandId", "companyName brandName location contactPerson")
+      .populate("assignedCreators", "name username niche followers")
+      .sort({ dateCreated: -1 });
+
+    const shaped = briefs.map((b) => ({
+      _id: b._id,
+      title: b.title,
+      description: b.description,
+      deliverables: b.deliverables,
+      platform: b.platform,
+      budget: b.budget,
+      timeline: b.timeline,
+      guidelines: b.guidelines,
+      ndaNotes: b.ndaNotes,
+      status: b.status,
+      dateCreated: b.dateCreated,
+      brandName: b.brandId ? b.brandId.companyName || b.brandId.brandName : "—",
+      assignedCreators: (b.assignedCreators || []).map((c) => c.name || c.username),
+    }));
+
+    res.json(shaped);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updateBriefStatus(req, res, next) {
+  try {
+    const { status, assignCreatorId } = req.body;
+    const brief = await CampaignBrief.findById(req.params.id);
+    if (!brief) return res.status(404).json({ message: "Campaign Brief not found." });
+
+    if (status) brief.status = status;
+    if (assignCreatorId) {
+      if (!brief.assignedCreators.includes(assignCreatorId)) {
+        brief.assignedCreators.push(assignCreatorId);
+      }
+    }
+
+    await brief.save();
+    res.json(brief);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getAllCreatorPosts(req, res, next) {
+  try {
+    const posts = await CreatorPost.find()
+      .populate("creatorId", "name username niche followers")
+      .sort({ dateCreated: -1 });
+
+    const shaped = posts.map((p) => ({
+      _id: p._id,
+      title: p.title,
+      caption: p.caption,
+      platform: p.platform,
+      mediaUrl: p.mediaUrl,
+      externalPostUrl: p.externalPostUrl,
+      status: p.status,
+      dateCreated: p.dateCreated,
+      creatorName: p.creatorId ? p.creatorId.name || p.creatorId.username : "—",
+      creatorNiche: p.creatorId ? p.creatorId.niche : "—",
+    }));
+
+    res.json(shaped);
   } catch (err) {
     next(err);
   }
@@ -101,28 +176,7 @@ async function getAllCreators(req, res, next) {
   }
 }
 
-async function getAllCampaigns(req, res, next) {
-  try {
-    const campaigns = await CampaignRequirement.find()
-      .populate("brandId", "companyName brandName")
-      .sort({ dateCreated: -1 });
-    const shaped = campaigns.map((c) => ({
-      _id: c._id,
-      campaignName: c.campaignName,
-      brandName: c.brandId ? c.brandId.companyName || c.brandId.brandName : "—",
-      platform: c.platform,
-      budget: c.budget,
-      status: c.status,
-      dateCreated: c.dateCreated,
-    }));
-    res.json(shaped);
-  } catch (err) {
-    next(err);
-  }
-}
-
-// ---------- Excel Exports ----------
-
+// Excel Export utilities
 async function exportCreators(req, res, next) {
   try {
     const creators = await CreatorProfile.find();
@@ -183,21 +237,20 @@ async function exportLogins(req, res, next) {
   }
 }
 
-async function exportCampaigns(req, res, next) {
+async function exportBriefs(req, res, next) {
   try {
-    const campaigns = await CampaignRequirement.find().populate("brandId", "companyName brandName");
-    const rows = campaigns.map((c) => ({
-      campaignName: c.campaignName,
-      brandName: c.brandId ? c.brandId.companyName || c.brandId.brandName : "",
-      budget: c.budget, platform: c.platform, niche: c.niche,
-      followersRequired: c.followersRequired, status: c.status,
-      dateCreated: c.dateCreated ? c.dateCreated.toISOString() : "",
+    const briefs = await CampaignBrief.find().populate("brandId", "companyName brandName");
+    const rows = briefs.map((b) => ({
+      title: b.title,
+      brandName: b.brandId ? b.brandId.companyName || b.brandId.brandName : "",
+      budget: b.budget, platform: b.platform, timeline: b.timeline,
+      status: b.status, dateCreated: b.dateCreated ? b.dateCreated.toISOString() : "",
     }));
-    await sendExcel(res, "campaign-requirements.xlsx", [
-      { header: "Campaign Name", key: "campaignName" }, { header: "Brand", key: "brandName" },
+    await sendExcel(res, "campaign-briefs.xlsx", [
+      { header: "Title", key: "title" }, { header: "Brand", key: "brandName" },
       { header: "Budget", key: "budget" }, { header: "Platform", key: "platform" },
-      { header: "Niche", key: "niche" }, { header: "Followers Required", key: "followersRequired" },
-      { header: "Status", key: "status" }, { header: "Date Created", key: "dateCreated" },
+      { header: "Timeline", key: "timeline" }, { header: "Status", key: "status" },
+      { header: "Date Created", key: "dateCreated" },
     ], rows);
   } catch (err) {
     next(err);
@@ -205,7 +258,8 @@ async function exportCampaigns(req, res, next) {
 }
 
 module.exports = {
-  getStats, getAllUsers, updateUserStatus, deleteUser,
-  getAllBrands, getAllCreators, getAllCampaigns,
-  exportCreators, exportBrands, exportLogins, exportCampaigns,
+  getStats, getAllBriefs, updateBriefStatus, getAllCreatorPosts,
+  getAllUsers, updateUserStatus, deleteUser,
+  getAllBrands, getAllCreators,
+  exportCreators, exportBrands, exportLogins, exportBriefs,
 };

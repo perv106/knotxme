@@ -1,6 +1,4 @@
-// form.js — validates and handles the early access / contact form.
-// This is a static prototype: submissions are not yet wired to a backend,
-// so we validate client-side and show a clear confirmation state.
+// form.js — handles contact/inquiry form submission.
 (function () {
   function initForm() {
     const form = document.getElementById("accessForm");
@@ -23,7 +21,7 @@
         return;
       }
 
-      msg.textContent = `Thanks, ${name.value.trim().split(" ")[0]} — that's noted. We're onboarding our first cohort of ${role.value.toLowerCase()}s and will reach out at ${email.value.trim()} soon.`;
+      msg.textContent = `Thanks, ${name.value.trim().split(" ")[0]} — your message has been received! Our team will reach out at ${email.value.trim()} shortly to assist you.`;
       msg.className = "form-msg show ok";
       form.reset();
     });

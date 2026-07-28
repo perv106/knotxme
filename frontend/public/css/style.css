@@ -30,8 +30,11 @@
   --ink-60:rgba(16,27,51,.64);
   --ink-40:rgba(16,27,51,.42);
   --paper-60:rgba(245,244,239,0.97);
-  --radius:2px;
+  --radius:10px;
   --max:1180px;
+  --shadow-sm:0 2px 8px rgba(16,27,51,0.04);
+  --shadow-md:0 6px 20px rgba(16,27,51,0.06);
+  --shadow-lg:0 12px 32px rgba(16,27,51,0.09);
 }
 
 *,*::before,*::after{box-sizing:border-box;}
@@ -502,15 +505,32 @@ p
 .dash-table td{padding:12px;border-bottom:1px solid var(--line);color:var(--ink);}
 .dash-empty{color:var(--ink-60);font-size:14px;padding:20px 0;text-align:center;}
 .status-pill{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em;}
-.status-pill.open{background:rgba(31,111,92,.12);color:var(--teal);}
-.status-pill.pending{background:rgba(227,163,53,.16);color:var(--gold-deep);}
-.status-pill.closed{background:rgba(16,27,51,.08);color:var(--ink-60);}
+.status-pill.open,.status-pill.published,.status-pill.matched{background:rgba(31,111,92,.12);color:var(--teal);}
+.status-pill.pending,.status-pill.submitted,.status-pill.under-review{background:rgba(227,163,53,.16);color:var(--gold-deep);}
+.status-pill.closed,.status-pill.draft{background:rgba(16,27,51,.08);color:var(--ink-60);}
 .status-pill.blocked{background:rgba(177,74,59,.12);color:#B14A3B;}
 .filter-bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px;}
 .filter-bar select,.filter-bar input{padding:9px 12px;border:1px solid var(--line);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px;background:var(--paper);}
-.opp-card{border:1px solid var(--line);border-radius:var(--radius);padding:22px;background:var(--paper);margin-bottom:14px;}
+.opp-card{border:1px solid var(--line);border-radius:var(--radius);padding:22px;background:var(--paper);margin-bottom:14px;box-shadow:var(--shadow-sm);transition:transform .2s ease, box-shadow .2s ease;}
+.opp-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
 .opp-card h3{font-size:17px;}
 .opp-card .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
 .loading-row{color:var(--ink-60);font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+
+.privacy-banner{
+  background:rgba(16,27,51,.04);
+  border:1px solid var(--line);
+  border-left:4px solid var(--gold-deep);
+  border-radius:var(--radius);
+  padding:16px 20px;
+  margin-bottom:24px;
+  font-size:13.5px;
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.privacy-banner svg{width:20px;height:20px;flex:none;color:var(--gold-deep);}
+
 
 
